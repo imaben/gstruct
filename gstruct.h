@@ -33,11 +33,12 @@ typedef enum {
 /** @} */
 
 /**
- * Base struct
+ * Base struct and operation api
  * @{
  */
 struct gstruct;
 struct gstruct_kv;
+struct gstruct_buffer;
 
 typedef struct {
     uint32_t size;
@@ -81,13 +82,65 @@ typedef union {
 typedef struct gstruct {
     gstruct_type type;
     gstruct_union via;
+    struct gstruct_buffer *buffer;
 } gstruct;
 
 typedef struct gstruct_kv {
     gstruct key;
     gstruct val;
 } gstruct_kv;
+
+static gstruct* gstruct_new();
+static void gstruct_free(gstruct* gs);
+
+static int gstruct_add_char(gstruct* gs, char d);
+static int gstruct_add_signed_char(gstruct* gs, signed char d);
+static int gstruct_add_short(gstruct* gs, short d);
+static int gstruct_add_int(gstruct* gs, int d);
+static int gstruct_add_long(gstruct* gs, long d);
+static int gstruct_add_long_long(gstruct* gs, long long d);
+static int gstruct_add_unsigned_char(gstruct* gs, unsigned char d);
+static int gstruct_add_unsigned_short(gstruct* gs, unsigned short d);
+static int gstruct_add_unsigned_int(gstruct* gs, unsigned int d);
+static int gstruct_add_unsigned_long(gstruct* gs, unsigned long d);
+static int gstruct_add_unsigned_long_long(gstruct* gs, unsigned long long d);
+
+static int gstruct_add_uint8(gstruct* gs, uint8_t d);
+static int gstruct_add_uint16(gstruct* gs, uint16_t d);
+static int gstruct_add_uint32(gstruct* gs, uint32_t d);
+static int gstruct_add_uint64(gstruct* gs, uint64_t d);
+static int gstruct_add_int8(gstruct* gs, int8_t d);
+static int gstruct_add_int16(gstruct* gs, int16_t d);
+static int gstruct_add_int32(gstruct* gs, int32_t d);
+static int gstruct_add_int64(gstruct* gs, int64_t d);
+
+static int gstruct_add_float(gstruct* gs, float d);
+static int gstruct_add_double(gstruct* gs, double d);
+
+static int gstruct_add_nil(gstruct* gs);
+static int gstruct_add_true(gstruct* gs);
+static int gstruct_add_false(gstruct* gs);
+
+static int gstruct_add_array(gstruct* gs, size_t n);
+
+static int gstruct_add_map(gstruct* gs, size_t n);
+
+static int gstruct_add_str(gstruct* gs, size_t l);
+static int gstruct_add_str_body(gstruct* gs, const void* b, size_t l);
+
+static int gstruct_add_v4raw(gstruct* gs, size_t l);
+static int gstruct_add_v4raw_body(gstruct* gs, const void* b, size_t l);
+
+static int gstruct_add_bin(gstruct* gs, size_t l);
+static int gstruct_add_bin_body(gstruct* gs, const void* b, size_t l);
+
+static int gstruct_add_ext(gstruct* gs, size_t l, int8_t type);
+static int gstruct_add_ext_body(gstruct* gs, const void* b, size_t l);
+
+static int gstruct_apply_data(gstruct *gs);
 /** @} */
+
+
 
 /**
  * Buffer struct
