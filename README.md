@@ -1,1 +1,3 @@
 # gstruct
+
+General struct
