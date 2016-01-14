@@ -18,17 +18,17 @@ typedef int bool;
  * @{
  */
 typedef enum {
-    GSTRUCT_TYPE_NIL                  = 0x00,
-    GSTRUCT_TYPE_BOOLEAN              = 0x01,
-    GSTRUCT_TYPE_POSITIVE_INTEGER     = 0x02,
-    GSTRUCT_TYPE_NEGATIVE_INTEGER     = 0x03,
-    GSTRUCT_TYPE_FLOAT                = 0x04,
-    GSTRUCT_TYPE_DOUBLE               = GSTRUCT_TYPE_FLOAT, /* obsolete */
-    GSTRUCT_TYPE_STR                  = 0x05,
-    GSTRUCT_TYPE_ARRAY                = 0x06,
-    GSTRUCT_TYPE_MAP                  = 0x07,
-    GSTRUCT_TYPE_BIN                  = 0x08,
-    GSTRUCT_TYPE_EXT                  = 0x09
+    GSTRUCT_TYPE_NIL                = 0x00,
+    GSTRUCT_TYPE_BOOLEAN            = 0x01,
+    GSTRUCT_TYPE_INTEGER            = 0x02,
+    GSTRUCT_TYPE_CHAR               = 0x03,
+    GSTRUCT_TYPE_FLOAT              = 0x04,
+    GSTRUCT_TYPE_DOUBLE             = GSTRUCT_TYPE_FLOAT, /* obsolete */
+    GSTRUCT_TYPE_STR                = 0x05,
+    GSTRUCT_TYPE_ARRAY              = 0x06,
+    GSTRUCT_TYPE_MAP                = 0x07,
+    GSTRUCT_TYPE_BIN                = 0x08,
+    GSTRUCT_TYPE_EXT                = 0x09
 } gstruct_type;
 /** @} */
 
@@ -67,16 +67,15 @@ typedef struct {
 } gstruct_ext;
 
 typedef union {
-    bool boolean;
-    uint64_t u64;
-    int64_t  i64;
-    double   dec;
-    double   f64;
-    gstruct_array array;
-    gstruct_map map;
-    gstruct_str str;
-    gstruct_bin bin;
-    gstruct_ext ext;
+    bool            boolean;
+    char            chr;
+    long            lval;
+    double          dval;
+    gstruct_str     str;
+    gstruct_array   array;
+    gstruct_map     map;
+    gstruct_bin     bin;
+    gstruct_ext     ext;
 } gstruct_union;
 
 typedef struct gstruct {
@@ -94,25 +93,8 @@ static gstruct* gstruct_new();
 static void gstruct_free(gstruct* gs);
 
 static int gstruct_add_char(gstruct* gs, char d);
-static int gstruct_add_signed_char(gstruct* gs, signed char d);
-static int gstruct_add_short(gstruct* gs, short d);
 static int gstruct_add_int(gstruct* gs, int d);
 static int gstruct_add_long(gstruct* gs, long d);
-static int gstruct_add_long_long(gstruct* gs, long long d);
-static int gstruct_add_unsigned_char(gstruct* gs, unsigned char d);
-static int gstruct_add_unsigned_short(gstruct* gs, unsigned short d);
-static int gstruct_add_unsigned_int(gstruct* gs, unsigned int d);
-static int gstruct_add_unsigned_long(gstruct* gs, unsigned long d);
-static int gstruct_add_unsigned_long_long(gstruct* gs, unsigned long long d);
-
-static int gstruct_add_uint8(gstruct* gs, uint8_t d);
-static int gstruct_add_uint16(gstruct* gs, uint16_t d);
-static int gstruct_add_uint32(gstruct* gs, uint32_t d);
-static int gstruct_add_uint64(gstruct* gs, uint64_t d);
-static int gstruct_add_int8(gstruct* gs, int8_t d);
-static int gstruct_add_int16(gstruct* gs, int16_t d);
-static int gstruct_add_int32(gstruct* gs, int32_t d);
-static int gstruct_add_int64(gstruct* gs, int64_t d);
 
 static int gstruct_add_float(gstruct* gs, float d);
 static int gstruct_add_double(gstruct* gs, double d);
@@ -127,9 +109,6 @@ static int gstruct_add_map(gstruct* gs, size_t n);
 
 static int gstruct_add_str(gstruct* gs, size_t l);
 static int gstruct_add_str_body(gstruct* gs, const void* b, size_t l);
-
-static int gstruct_add_v4raw(gstruct* gs, size_t l);
-static int gstruct_add_v4raw_body(gstruct* gs, const void* b, size_t l);
 
 static int gstruct_add_bin(gstruct* gs, size_t l);
 static int gstruct_add_bin_body(gstruct* gs, const void* b, size_t l);
@@ -169,21 +148,23 @@ static inline gstruct_buffer* gstruct_buffer_new(void)
 
 static inline void gstruct_buffer_free(gstruct_buffer* buf)
 {
-    if(buf == NULL) { return; }
+    if (buf == NULL) {
+        return;
+    }
     gstruct_buffer_destroy(buf);
     free(buf);
 }
 
-static inline int gstruct_buffer_write(void* data, const char* buf, size_t len)
+static inline int gstruct_buffer_write(void* data, const void* buf, size_t len)
 {
     gstruct_buffer* gbuf = (gstruct_buffer*)data;
 
-    if(gbuf->alloc - gbuf->size < len) {
+    if (gbuf->alloc - gbuf->size < len) {
         void* tmp;
         size_t nsize = (gbuf->alloc) ?
                 gbuf->alloc * 2 : GSTRUCT_BUFFER_INIT_SIZE;
 
-        while(nsize < gbuf->size + len) {
+        while (nsize < gbuf->size + len) {
             size_t tmp_nsize = nsize * 2;
             if (tmp_nsize <= nsize) {
                 nsize = gbuf->size + len;
@@ -193,7 +174,9 @@ static inline int gstruct_buffer_write(void* data, const char* buf, size_t len)
         }
 
         tmp = realloc(gbuf->data, nsize);
-        if(!tmp) { return -1; }
+        if (!tmp) {
+            return -1;
+        }
 
         gbuf->data = (char*)tmp;
         gbuf->alloc = nsize;
