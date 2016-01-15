@@ -28,36 +28,60 @@ static int gstruct_add_char(gstruct* gs, char d)
 
 static int gstruct_add_int(gstruct* gs, int d)
 {
+    gstruct_add_long(gs, d);
     return 0;
 }
 
 static int gstruct_add_long(gstruct* gs, long d)
 {
+    gstruct g;
+    g.type = GSTRUCT_TYPE_INTEGER;
+    g.via.lval = d;
+    gstruct_buffer_write(gs->buffer, &g, sizeof(gstruct));
     return 0;
 }
 
 static int gstruct_add_float(gstruct* gs, float d)
 {
+    gstruct g;
+    g.type = GSTRUCT_TYPE_FLOAT;
+    g.via.dval = d;
+    gstruct_buffer_write(gs->buffer, &g, sizeof(gstruct));
     return 0;
 }
 
 static int gstruct_add_double(gstruct* gs, double d)
 {
+    gstruct g;
+    g.type = GSTRUCT_TYPE_DOUBLE;
+    g.via.dval = d;
+    gstruct_buffer_write(gs->buffer, &g, sizeof(gstruct));
     return 0;
 }
 
 static int gstruct_add_nil(gstruct* gs)
 {
+    gstruct g;
+    g.type = GSTRUCT_TYPE_NIL;
+    gstruct_buffer_write(gs->buffer, &g, sizeof(gstruct));
     return 0;
 }
 
 static int gstruct_add_true(gstruct* gs)
 {
+    gstruct g;
+    g.type = GSTRUCT_TYPE_BOOLEAN;
+    g.via.boolean = 1;
+    gstruct_buffer_write(gs->buffer, &g, sizeof(gstruct));
     return 0;
 }
 
 static int gstruct_add_false(gstruct* gs)
 {
+    gstruct g;
+    g.type = GSTRUCT_TYPE_BOOLEAN;
+    g.via.boolean = 0;
+    gstruct_buffer_write(gs->buffer, &g, sizeof(gstruct));
     return 0;
 }
 
