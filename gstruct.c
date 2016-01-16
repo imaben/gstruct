@@ -88,41 +88,83 @@ static int gstruct_add_false(gstruct* gs)
 
 static int gstruct_add_array(gstruct* gs, size_t n)
 {
+    gstruct g;
+    g.type = GSTRUCT_TYPE_ARRAY;
+    gstruct_buffer_write(gs->buffer, &g, sizeof(gstruct));
+
+    gstruct_array arr;
+    arr.size = n;
+    gstruct_buffer_write(gs->buffer, &arr, sizeof(gstruct_array));
     return 0;
 }
 
 static int gstruct_add_map(gstruct* gs, size_t n)
 {
+    gstruct g;
+    g.type = GSTRUCT_TYPE_MAP;
+    gstruct_buffer_write(gs->buffer, &g, sizeof(gstruct));
+
+    gstruct_map m;
+    m.size = n;
+    gstruct_buffer_write(gs->buffer, &m, sizeof(gstruct_map));
+
     return 0;
 }
 
 static int gstruct_add_str(gstruct* gs, size_t l)
 {
+    gstruct g;
+    g.type = GSTRUCT_TYPE_STR;
+    gstruct_buffer_write(gs->buffer, &g, sizeof(gstruct));
+
+    gstruct_str s;
+    s.size = l;
+    gstruct_buffer_write(gs->buffer, &s, sizeof(gstruct_str));
+
     return 0;
 }
 
 static int gstruct_add_str_body(gstruct* gs, const void* b, size_t l)
 {
+    gstruct_buffer_write(gs->buffer, b, l);
     return 0;
 }
 
 static int gstruct_add_bin(gstruct* gs, size_t l)
 {
+    gstruct g;
+    g.type = GSTRUCT_TYPE_BIN;
+    gstruct_buffer_write(gs->buffer, &g, sizeof(gstruct));
+
+    gstruct_bin b;
+    b.size = l;
+    gstruct_buffer_write(gs->buffer, &b, sizeof(gstruct_bin));
+
     return 0;
 }
 
 static int gstruct_add_bin_body(gstruct* gs, const void* b, size_t l)
 {
+    gstruct_buffer_write(gs->buffer, b, l);
     return 0;
 }
 
 static int gstruct_add_ext(gstruct* gs, size_t l, int8_t type)
 {
+    gstruct g;
+    g.type = GSTRUCT_TYPE_EXT;
+    gstruct_buffer_write(gs->buffer, &g, sizeof(gstruct));
+
+    gstruct_ext e;
+    e.type = type;
+    e.size = l;
+    gstruct_buffer_write(gs->buffer, &e, sizeof(gstruct_ext));
     return 0;
 }
 
 static int gstruct_add_ext_body(gstruct* gs, const void* b, size_t l)
 {
+    gstruct_buffer_write(gs->buffer, b, l);
     return 0;
 }
 
