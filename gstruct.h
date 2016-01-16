@@ -33,6 +33,19 @@ typedef enum {
 /** @} */
 
 /**
+ * gstruct apply data error
+ * @{
+ */
+typedef enum {
+    GSTRUCT_SUCCESS              =  2,
+    GSTRUCT_EXTRA_BYTES          =  1,
+    GSTRUCT_CONTINUE             =  0,
+    GSTRUCT_PARSE_ERROR          = -1,
+    GSTRUCT_NOMEM_ERROR          = -2
+} gstruct_apply_return;
+/** @} */
+
+/**
  * Base struct and operation api
  * @{
  */
@@ -89,34 +102,34 @@ typedef struct gstruct_kv {
     gstruct val;
 } gstruct_kv;
 
-static gstruct* gstruct_new();
-static void gstruct_free(gstruct* gs);
+gstruct* gstruct_new();
+void gstruct_free(gstruct* gs);
 
-static int gstruct_add_char(gstruct* gs, char d);
-static int gstruct_add_int(gstruct* gs, int d);
-static int gstruct_add_long(gstruct* gs, long d);
+int gstruct_add_char(gstruct* gs, char d);
+int gstruct_add_int(gstruct* gs, int d);
+int gstruct_add_long(gstruct* gs, long d);
 
-static int gstruct_add_float(gstruct* gs, float d);
-static int gstruct_add_double(gstruct* gs, double d);
+int gstruct_add_float(gstruct* gs, float d);
+int gstruct_add_double(gstruct* gs, double d);
 
-static int gstruct_add_nil(gstruct* gs);
-static int gstruct_add_true(gstruct* gs);
-static int gstruct_add_false(gstruct* gs);
+int gstruct_add_nil(gstruct* gs);
+int gstruct_add_true(gstruct* gs);
+int gstruct_add_false(gstruct* gs);
 
-static int gstruct_add_array(gstruct* gs, size_t n);
+int gstruct_add_array(gstruct* gs, size_t n);
 
-static int gstruct_add_map(gstruct* gs, size_t n);
+int gstruct_add_map(gstruct* gs, size_t n);
 
-static int gstruct_add_str(gstruct* gs, size_t l);
-static int gstruct_add_str_body(gstruct* gs, const void* b, size_t l);
+int gstruct_add_str(gstruct* gs, size_t l);
+int gstruct_add_str_body(gstruct* gs, const void* b, size_t l);
 
-static int gstruct_add_bin(gstruct* gs, size_t l);
-static int gstruct_add_bin_body(gstruct* gs, const void* b, size_t l);
+int gstruct_add_bin(gstruct* gs, size_t l);
+int gstruct_add_bin_body(gstruct* gs, const void* b, size_t l);
 
-static int gstruct_add_ext(gstruct* gs, size_t l, int8_t type);
-static int gstruct_add_ext_body(gstruct* gs, const void* b, size_t l);
+int gstruct_add_ext(gstruct* gs, size_t l, int8_t type);
+int gstruct_add_ext_body(gstruct* gs, const void* b, size_t l);
 
-static int gstruct_apply_data(gstruct *gs);
+gstruct_apply_return gstruct_apply_data(gstruct *gs);
 /** @} */
 
 

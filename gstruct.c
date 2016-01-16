@@ -1,6 +1,6 @@
 #include "gstruct.h"
 
-static gstruct* gstruct_new()
+gstruct* gstruct_new()
 {
     gstruct *gs = (gstruct *)malloc(sizeof(gstruct));
     gs->type = -1;
@@ -9,7 +9,7 @@ static gstruct* gstruct_new()
     return gs;
 }
 
-static void gstruct_free(gstruct* gs)
+void gstruct_free(gstruct* gs)
 {
     if (gs->buffer) {
         free(gs->buffer);
@@ -17,7 +17,7 @@ static void gstruct_free(gstruct* gs)
     free(gs);
 }
 
-static int gstruct_add_char(gstruct* gs, char d)
+int gstruct_add_char(gstruct* gs, char d)
 {
     gstruct g;
     g.type = GSTRUCT_TYPE_CHAR;
@@ -26,13 +26,13 @@ static int gstruct_add_char(gstruct* gs, char d)
     return 0;
 }
 
-static int gstruct_add_int(gstruct* gs, int d)
+int gstruct_add_int(gstruct* gs, int d)
 {
     gstruct_add_long(gs, d);
     return 0;
 }
 
-static int gstruct_add_long(gstruct* gs, long d)
+int gstruct_add_long(gstruct* gs, long d)
 {
     gstruct g;
     g.type = GSTRUCT_TYPE_INTEGER;
@@ -41,7 +41,7 @@ static int gstruct_add_long(gstruct* gs, long d)
     return 0;
 }
 
-static int gstruct_add_float(gstruct* gs, float d)
+int gstruct_add_float(gstruct* gs, float d)
 {
     gstruct g;
     g.type = GSTRUCT_TYPE_FLOAT;
@@ -50,7 +50,7 @@ static int gstruct_add_float(gstruct* gs, float d)
     return 0;
 }
 
-static int gstruct_add_double(gstruct* gs, double d)
+int gstruct_add_double(gstruct* gs, double d)
 {
     gstruct g;
     g.type = GSTRUCT_TYPE_DOUBLE;
@@ -59,7 +59,7 @@ static int gstruct_add_double(gstruct* gs, double d)
     return 0;
 }
 
-static int gstruct_add_nil(gstruct* gs)
+int gstruct_add_nil(gstruct* gs)
 {
     gstruct g;
     g.type = GSTRUCT_TYPE_NIL;
@@ -67,7 +67,7 @@ static int gstruct_add_nil(gstruct* gs)
     return 0;
 }
 
-static int gstruct_add_true(gstruct* gs)
+int gstruct_add_true(gstruct* gs)
 {
     gstruct g;
     g.type = GSTRUCT_TYPE_BOOLEAN;
@@ -76,7 +76,7 @@ static int gstruct_add_true(gstruct* gs)
     return 0;
 }
 
-static int gstruct_add_false(gstruct* gs)
+int gstruct_add_false(gstruct* gs)
 {
     gstruct g;
     g.type = GSTRUCT_TYPE_BOOLEAN;
@@ -86,7 +86,7 @@ static int gstruct_add_false(gstruct* gs)
 }
 
 
-static int gstruct_add_array(gstruct* gs, size_t n)
+int gstruct_add_array(gstruct* gs, size_t n)
 {
     gstruct g;
     g.type = GSTRUCT_TYPE_ARRAY;
@@ -98,7 +98,7 @@ static int gstruct_add_array(gstruct* gs, size_t n)
     return 0;
 }
 
-static int gstruct_add_map(gstruct* gs, size_t n)
+int gstruct_add_map(gstruct* gs, size_t n)
 {
     gstruct g;
     g.type = GSTRUCT_TYPE_MAP;
@@ -111,7 +111,7 @@ static int gstruct_add_map(gstruct* gs, size_t n)
     return 0;
 }
 
-static int gstruct_add_str(gstruct* gs, size_t l)
+int gstruct_add_str(gstruct* gs, size_t l)
 {
     gstruct g;
     g.type = GSTRUCT_TYPE_STR;
@@ -124,13 +124,13 @@ static int gstruct_add_str(gstruct* gs, size_t l)
     return 0;
 }
 
-static int gstruct_add_str_body(gstruct* gs, const void* b, size_t l)
+int gstruct_add_str_body(gstruct* gs, const void* b, size_t l)
 {
     gstruct_buffer_write(gs->buffer, b, l);
     return 0;
 }
 
-static int gstruct_add_bin(gstruct* gs, size_t l)
+int gstruct_add_bin(gstruct* gs, size_t l)
 {
     gstruct g;
     g.type = GSTRUCT_TYPE_BIN;
@@ -143,13 +143,13 @@ static int gstruct_add_bin(gstruct* gs, size_t l)
     return 0;
 }
 
-static int gstruct_add_bin_body(gstruct* gs, const void* b, size_t l)
+int gstruct_add_bin_body(gstruct* gs, const void* b, size_t l)
 {
     gstruct_buffer_write(gs->buffer, b, l);
     return 0;
 }
 
-static int gstruct_add_ext(gstruct* gs, size_t l, int8_t type)
+int gstruct_add_ext(gstruct* gs, size_t l, int8_t type)
 {
     gstruct g;
     g.type = GSTRUCT_TYPE_EXT;
@@ -162,14 +162,60 @@ static int gstruct_add_ext(gstruct* gs, size_t l, int8_t type)
     return 0;
 }
 
-static int gstruct_add_ext_body(gstruct* gs, const void* b, size_t l)
+int gstruct_add_ext_body(gstruct* gs, const void* b, size_t l)
 {
     gstruct_buffer_write(gs->buffer, b, l);
     return 0;
 }
 
-static int gstruct_apply_data(gstruct *gs)
+inline char *gstruct_parse_scalar(char *buffer)
 {
-    return 0;
+    return buffer + sizeof(gstruct);
 }
 
+inline char *gstruct_parse_str(gstruct *gs, char *buffer)
+{
+    char *cursor;
+    gstruct_str *s = (gstruct_str *)(buffer);
+    gs->via.str.size = s->size;
+
+    cursor += sizeof(gstruct_str);
+    gs->via.str.ptr = cursor;
+    return cursor + s->size;
+}
+
+gstruct_apply_return gstruct_apply_data(gstruct *gs)
+{
+    if (!gs->buffer) {
+        return GSTRUCT_NOMEM_ERROR;
+    }
+
+    gstruct_buffer *buffer = gs->buffer;
+    char *cursor = buffer->data;
+    while (cursor < buffer->data + buffer->size) {
+        gstruct *g = (gstruct *)cursor;
+        switch (g->type) {
+            case GSTRUCT_TYPE_NIL:
+            case GSTRUCT_TYPE_BOOLEAN:
+            case GSTRUCT_TYPE_INTEGER:
+            case GSTRUCT_TYPE_CHAR:
+            case GSTRUCT_TYPE_DOUBLE:
+                cursor = gstruct_parse_scalar(cursor);
+                break;
+            case GSTRUCT_TYPE_STR:
+                cursor = gstruct_parse_str(g, cursor);
+                break;
+            case GSTRUCT_TYPE_ARRAY:
+                break;
+            case GSTRUCT_TYPE_MAP:
+                break;
+            case GSTRUCT_TYPE_BIN:
+                break;
+            case GSTRUCT_TYPE_EXT:
+                break;
+            default:
+                return GSTRUCT_PARSE_ERROR;
+        }
+    }
+    return GSTRUCT_SUCCESS;
+}
