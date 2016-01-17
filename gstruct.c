@@ -184,6 +184,17 @@ inline char *gstruct_parse_str(gstruct *gs, char *buffer)
     return cursor + s->size;
 }
 
+inline gstruct *gstruct_parse_array(char *buffer)
+{
+    int i = 0;
+    gstruct_array *arr = (gstruct_arr *)buffer;
+    char *cursor = buffer;
+    for (; i < arr->size; i++) {
+        cursor += sizeof(gstruct_array);
+        gstruct *gs = (gstruct *)cursor;
+    }
+}
+
 gstruct_apply_return gstruct_apply_data(gstruct *gs)
 {
     if (!gs->buffer) {
