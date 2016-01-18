@@ -168,57 +168,50 @@ int gstruct_add_ext_body(gstruct* gs, const void* b, size_t l)
     return 0;
 }
 
-inline char *gstruct_parse_scalar(char *buffer)
+static inline int gstruct_parse(gstruct *gs, char *buffer, char **offset)
 {
-    return buffer + sizeof(gstruct);
-}
-
-inline char *gstruct_parse_str(gstruct *gs, char *buffer)
-{
-    char *cursor;
-    gstruct_str *s = (gstruct_str *)(buffer);
-    gs->via.str.size = s->size;
-
-    cursor += sizeof(gstruct_str);
-    gs->via.str.ptr = cursor;
-    return cursor + s->size;
-}
-
-inline char *gstruct_parse_array(char *buffer)
-{
+    gstruct *g = (gstruct *)buffer;
+    gs->type = g->type;
+    char *cursor = buffer + sizeof(gstruct);
     int i = 0;
-    gstruct_array *arr = (gstruct_array *)buffer;
-    char *cursor = buffer;
-    for (; i < arr->size; i++) {
-        cursor += sizeof(gstruct_array);
-        gstruct *g = (gstruct *)cursor;
-        switch (arr->ptr[i].type) {
-            case GSTRUCT_TYPE_NIL:
-            case GSTRUCT_TYPE_BOOLEAN:
-            case GSTRUCT_TYPE_INTEGER:
-            case GSTRUCT_TYPE_CHAR:
-            case GSTRUCT_TYPE_DOUBLE:
-                arr->ptr = (gstruct *)gstruct_parse_scalar(cursor);
-                break;
-            case GSTRUCT_TYPE_STR:
-                arr->ptr = (gstruct *)gstruct_parse_str(g, cursor);
-                break;
-            case GSTRUCT_TYPE_ARRAY:
-                arr->ptr = (gstruct *)gstruct_parse_array(cursor);
-                break;
-            case GSTRUCT_TYPE_MAP:
-                break;
-            case GSTRUCT_TYPE_BIN:
-                break;
-            case GSTRUCT_TYPE_EXT:
-                break;
-            default:
-                return buffer;
+    gstruct_str *s = NULL;
+    gstruct_array *a = NULL;
+    switch (g->type) {
+        case GSTRUCT_TYPE_NIL:
+        case GSTRUCT_TYPE_BOOLEAN:
+        case GSTRUCT_TYPE_INTEGER:
+        case GSTRUCT_TYPE_CHAR:
+        case GSTRUCT_TYPE_DOUBLE:
+            gs->via = g->via;
+            *offset = cursor;
+            return GSTRUCT_SUCCESS;
+        case GSTRUCT_TYPE_STR:
+            s = (gstruct_str *)cursor;
+            gs->via.str.size = s->size;
 
-        }
-        arr->ptr++;
+            cursor += sizeof(gstruct_str);
+            gs->via.str.ptr = cursor;
+            *offset = cursor + s->size;
+            return GSTRUCT_SUCCESS;
+        case GSTRUCT_TYPE_ARRAY:
+            a = (gstruct_array *)cursor;
+            gs->via.array.size = a->size;
+
+            cursor += sizeof(gstruct_array);
+            for (i = 0; i < a->size; i++) {
+                gstruct_parse(gs->via.array.ptr++, cursor, &cursor);
+            }
+            return GSTRUCT_SUCCESS;
+        case GSTRUCT_TYPE_MAP:
+            // parse key
+        case GSTRUCT_TYPE_BIN:
+            break;
+        case GSTRUCT_TYPE_EXT:
+            break;
+        default:
+            return GSTRUCT_PARSE_ERROR;
     }
-    return cursor;
+
 }
 
 gstruct_apply_return gstruct_apply_data(gstruct *gs)
@@ -228,31 +221,6 @@ gstruct_apply_return gstruct_apply_data(gstruct *gs)
     }
 
     gstruct_buffer *buffer = gs->buffer;
-    char *cursor = buffer->data;
-    while (cursor < buffer->data + buffer->size) {
-        gstruct *g = (gstruct *)cursor;
-        switch (g->type) {
-            case GSTRUCT_TYPE_NIL:
-            case GSTRUCT_TYPE_BOOLEAN:
-            case GSTRUCT_TYPE_INTEGER:
-            case GSTRUCT_TYPE_CHAR:
-            case GSTRUCT_TYPE_DOUBLE:
-                cursor = gstruct_parse_scalar(cursor);
-                break;
-            case GSTRUCT_TYPE_STR:
-                cursor = gstruct_parse_str(g, cursor);
-                break;
-            case GSTRUCT_TYPE_ARRAY:
-                break;
-            case GSTRUCT_TYPE_MAP:
-                break;
-            case GSTRUCT_TYPE_BIN:
-                break;
-            case GSTRUCT_TYPE_EXT:
-                break;
-            default:
-                return GSTRUCT_PARSE_ERROR;
-        }
-    }
-    return GSTRUCT_SUCCESS;
+    char *offset;
+    return gstruct_parse(gs, gs->buffer->data, &offset);
 }
