@@ -12,23 +12,31 @@ typedef int bool;
 #define GSTRUCT_BUFFER_INIT_SIZE 8192
 #endif
 
+#define   GS_CHR_P(g)          g->via.chr
+#define   GS_INT_P(g)          g->via.lval
+#define   GS_LONG_P(g)         g->via.lval
+#define   GS_DOUBLE_P(g)       g->via.dval
+#define   GS_STR_SIZE_P(g)     g->via.str.size
+#define   GS_STR_PTR_P(g)      g->via.str.ptr
+#define   GS_ARRAY_SIZE_P(g)   g->via.array.size
+#define   GS_ARRAY_VAL_P(g,o)  g->via.array.ptr[o]
 
 /**
  * gstruct type
  * @{
  */
 typedef enum {
-    GSTRUCT_TYPE_NIL                = 0x00,
-    GSTRUCT_TYPE_BOOLEAN            = 0x01,
-    GSTRUCT_TYPE_INTEGER            = 0x02,
-    GSTRUCT_TYPE_CHAR               = 0x03,
-    GSTRUCT_TYPE_FLOAT              = 0x04,
-    GSTRUCT_TYPE_DOUBLE             = GSTRUCT_TYPE_FLOAT, /* obsolete */
-    GSTRUCT_TYPE_STR                = 0x05,
-    GSTRUCT_TYPE_ARRAY              = 0x06,
-    GSTRUCT_TYPE_MAP                = 0x07,
-    GSTRUCT_TYPE_BIN                = 0x08,
-    GSTRUCT_TYPE_EXT                = 0x09
+    GSTRUCT_TYPE_NIL     = 0x00,
+    GSTRUCT_TYPE_BOOLEAN = 0x01,
+    GSTRUCT_TYPE_INTEGER = 0x02,
+    GSTRUCT_TYPE_CHAR    = 0x03,
+    GSTRUCT_TYPE_FLOAT   = 0x04,
+    GSTRUCT_TYPE_DOUBLE  = GSTRUCT_TYPE_FLOAT, /* obsolete */
+    GSTRUCT_TYPE_STR     = 0x05,
+    GSTRUCT_TYPE_ARRAY   = 0x06,
+    GSTRUCT_TYPE_MAP     = 0x07,
+    GSTRUCT_TYPE_BIN     = 0x08,
+    GSTRUCT_TYPE_EXT     = 0x09
 } gstruct_type;
 /** @} */
 
@@ -37,11 +45,11 @@ typedef enum {
  * @{
  */
 typedef enum {
-    GSTRUCT_SUCCESS              =  2,
-    GSTRUCT_EXTRA_BYTES          =  1,
-    GSTRUCT_CONTINUE             =  0,
-    GSTRUCT_PARSE_ERROR          = -1,
-    GSTRUCT_NOMEM_ERROR          = -2
+    GSTRUCT_SUCCESS     = 2,
+    GSTRUCT_EXTRA_BYTES = 1,
+    GSTRUCT_CONTINUE    = 0,
+    GSTRUCT_PARSE_ERROR = -1,
+    GSTRUCT_NOMEM_ERROR = -2
 } gstruct_apply_return;
 /** @} */
 
