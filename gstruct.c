@@ -184,15 +184,41 @@ inline char *gstruct_parse_str(gstruct *gs, char *buffer)
     return cursor + s->size;
 }
 
-inline gstruct *gstruct_parse_array(char *buffer)
+inline char *gstruct_parse_array(char *buffer)
 {
     int i = 0;
-    gstruct_array *arr = (gstruct_arr *)buffer;
+    gstruct_array *arr = (gstruct_array *)buffer;
     char *cursor = buffer;
     for (; i < arr->size; i++) {
         cursor += sizeof(gstruct_array);
-        gstruct *gs = (gstruct *)cursor;
+        gstruct *g = (gstruct *)cursor;
+        switch (arr->ptr[i].type) {
+            case GSTRUCT_TYPE_NIL:
+            case GSTRUCT_TYPE_BOOLEAN:
+            case GSTRUCT_TYPE_INTEGER:
+            case GSTRUCT_TYPE_CHAR:
+            case GSTRUCT_TYPE_DOUBLE:
+                arr->ptr = (gstruct *)gstruct_parse_scalar(cursor);
+                break;
+            case GSTRUCT_TYPE_STR:
+                arr->ptr = (gstruct *)gstruct_parse_str(g, cursor);
+                break;
+            case GSTRUCT_TYPE_ARRAY:
+                arr->ptr = (gstruct *)gstruct_parse_array(cursor);
+                break;
+            case GSTRUCT_TYPE_MAP:
+                break;
+            case GSTRUCT_TYPE_BIN:
+                break;
+            case GSTRUCT_TYPE_EXT:
+                break;
+            default:
+                return buffer;
+
+        }
+        arr->ptr++;
     }
+    return cursor;
 }
 
 gstruct_apply_return gstruct_apply_data(gstruct *gs)
