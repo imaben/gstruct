@@ -4,7 +4,7 @@ gstruct* gstruct_new()
 {
     gstruct *gs = (gstruct *)malloc(sizeof(gstruct));
     gs->type = -1;
-    gstruct_buffer_init(gs->buffer);
+    gstruct_buffer_init(&gs->buffer);
     gstruct_buffer_write(gs->buffer, gs, sizeof(gs));
     return gs;
 }

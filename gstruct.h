@@ -144,9 +144,11 @@ typedef struct gstruct_buffer {
     size_t alloc;
 } gstruct_buffer;
 
-static inline void gstruct_buffer_init(gstruct_buffer* buf)
+static inline void gstruct_buffer_init(gstruct_buffer** buf)
 {
-    memset(buf, 0, sizeof(gstruct_buffer));
+    *buf = (gstruct_buffer *)malloc(sizeof(gstruct_buffer));
+    (*buf)->alloc = 0;
+    (*buf)->size = 0;
 }
 
 static inline void gstruct_buffer_destroy(gstruct_buffer* buf)
