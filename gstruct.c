@@ -174,8 +174,10 @@ static inline int gstruct_parse(gstruct *gs, char *buffer, char **offset)
     gs->type = g->type;
     char *cursor = buffer + sizeof(gstruct);
     int i = 0;
-    gstruct_str *s = NULL;
-    gstruct_array *a = NULL;
+    gstruct_str *s      = NULL;
+    gstruct_array *a    = NULL;
+    gstruct_map *m      = NULL;
+    gstruct_bin *b      = NULL;
     switch (g->type) {
         case GSTRUCT_TYPE_NIL:
         case GSTRUCT_TYPE_BOOLEAN:
@@ -201,12 +203,30 @@ static inline int gstruct_parse(gstruct *gs, char *buffer, char **offset)
             for (i = 0; i < a->size; i++) {
                 gstruct_parse(gs->via.array.ptr++, cursor, &cursor);
             }
+            *offset = cursor;
             return GSTRUCT_SUCCESS;
         case GSTRUCT_TYPE_MAP:
-            // parse key
+            m = (gstruct_map *)cursor;
+            gs->via.map.size = m->size;
+
+            cursor += sizeof(gstruct_map);
+            for (i = 0; i < m->size; i++) {
+                gstruct_kv *kv = (gstruct_kv *)cursor;
+                gstruct_parse(&(kv->key), cursor, &cursor);
+                gstruct_parse(&(kv->val), cursor, &cursor);
+            }
+            *offset = cursor;
+            return GSTRUCT_SUCCESS;
         case GSTRUCT_TYPE_BIN:
-            break;
+            b = (gstruct_bin *)cursor;
+            gs->via.bin.size = b->size;
+
+            cursor += sizeof(gstruct_bin);
+            gs->via.str.ptr = cursor;
+            *offset = cursor + b->size;
+            return GSTRUCT_SUCCESS;
         case GSTRUCT_TYPE_EXT:
+            // todo
             break;
         default:
             return GSTRUCT_PARSE_ERROR;
