@@ -18,8 +18,8 @@ typedef int bool;
 #define   GS_DOUBLE_P(g)       g->via.dval
 #define   GS_STR_SIZE_P(g)     g->via.str.size
 #define   GS_STR_PTR_P(g)      g->via.str.ptr
-#define   GS_ARRAY_SIZE_P(g)   g->via.array.size
-#define   GS_ARRAY_VAL_P(g,o)  g->via.array.ptr[o]
+#define   GS_ARRSIZE_P(g)   g->via.array.size
+#define   GS_ARRVAL_P(g,o)  g->via.array.ptr[o]
 
 /**
  * gstruct type

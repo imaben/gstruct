@@ -94,6 +94,10 @@ int gstruct_add_array(gstruct* gs, size_t n)
     gstruct_array arr;
     arr.size = n;
     gstruct_buffer_write(gs->buffer, &arr, sizeof(gstruct_array));
+
+    for (int i = 1; i < n; i++) {
+        gstruct_buffer_write(gs->buffer, &g, sizeof(gstruct *));
+    }
     return 0;
 }
 
@@ -167,61 +171,65 @@ int gstruct_add_ext_body(gstruct* gs, const void* b, size_t l)
     return 0;
 }
 
-static inline int gstruct_parse(gstruct *gs, char *buffer, char **offset)
+static inline int gstruct_parse(gstruct **gspp, char *buffer, char **offset)
 {
-    gstruct *g = (gstruct *)buffer;
-    gs->type = g->type;
+    gstruct *gs = (gstruct *)buffer;
+    (*gspp)->type = gs->type;
     char *cursor = buffer + sizeof(gstruct);
     int i = 0;
     gstruct_str *s      = NULL;
     gstruct_array *a    = NULL;
     gstruct_map *m      = NULL;
     gstruct_bin *b      = NULL;
-    switch (g->type) {
+    switch (gs->type) {
         case GSTRUCT_TYPE_NIL:
         case GSTRUCT_TYPE_BOOLEAN:
         case GSTRUCT_TYPE_INTEGER:
         case GSTRUCT_TYPE_CHAR:
         case GSTRUCT_TYPE_DOUBLE:
-            gs->via = g->via;
+            (*gspp)->via = gs->via;
             *offset = cursor;
             return GSTRUCT_SUCCESS;
         case GSTRUCT_TYPE_STR:
             s = (gstruct_str *)cursor;
-            gs->via.str.size = s->size;
+            (*gspp)->via.str.size = s->size;
 
             cursor += sizeof(gstruct_str);
-            gs->via.str.ptr = cursor;
+            (*gspp)->via.str.ptr = cursor;
             *offset = cursor + s->size;
             return GSTRUCT_SUCCESS;
         case GSTRUCT_TYPE_ARRAY:
             a = (gstruct_array *)cursor;
-            gs->via.array.size = a->size;
+            (*gspp)->via.array.size = a->size;
 
             cursor += sizeof(gstruct_array);
+            cursor += sizeof(gstruct *) * (a->size - 1);
             for (i = 0; i < a->size; i++) {
-                gstruct_parse(gs->via.array.ptr++, cursor, &cursor);
+                gstruct *p = (gstruct *)(*gspp)->via.array.ptr + i;
+                gstruct_parse(&p, cursor, &cursor);
             }
             *offset = cursor;
             return GSTRUCT_SUCCESS;
         case GSTRUCT_TYPE_MAP:
             m = (gstruct_map *)cursor;
-            gs->via.map.size = m->size;
+            (*gspp)->via.map.size = m->size;
 
             cursor += sizeof(gstruct_map);
             for (i = 0; i < m->size; i++) {
                 gstruct_kv *kv = (gstruct_kv *)cursor;
-                gstruct_parse(&(kv->key), cursor, &cursor);
-                gstruct_parse(&(kv->val), cursor, &cursor);
+                gstruct *key = &kv->key;
+                gstruct *val = &kv->val;
+                gstruct_parse(&key, cursor, &cursor);
+                gstruct_parse(&val, cursor, &cursor);
             }
             *offset = cursor;
             return GSTRUCT_SUCCESS;
         case GSTRUCT_TYPE_BIN:
             b = (gstruct_bin *)cursor;
-            gs->via.bin.size = b->size;
+            (*gspp)->via.bin.size = b->size;
 
             cursor += sizeof(gstruct_bin);
-            gs->via.str.ptr = cursor;
+            (*gspp)->via.str.ptr = cursor;
             *offset = cursor + b->size;
             return GSTRUCT_SUCCESS;
         case GSTRUCT_TYPE_EXT:
@@ -241,5 +249,5 @@ gstruct_apply_return gstruct_apply_data(gstruct *gs)
 
     gstruct_buffer *buffer = gs->buffer;
     char *offset;
-    return gstruct_parse(gs, gs->buffer->data, &offset);
+    return gstruct_parse(&gs, gs->buffer->data, &offset);
 }
