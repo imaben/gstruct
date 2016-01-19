@@ -205,7 +205,7 @@ static inline int gstruct_parse(gstruct **gspp, char *buffer, char **offset)
             cursor += sizeof(gstruct_array);
             cursor += sizeof(gstruct *) * (a->size - 1);
             for (i = 0; i < a->size; i++) {
-                gstruct *p = (gstruct *)(*gspp)->via.array.ptr + i;
+                gstruct *p = ((gstruct *)(*gspp)->via.array.ptr + i);
                 gstruct_parse(&p, cursor, &cursor);
             }
             *offset = cursor;
