@@ -115,8 +115,8 @@ typedef struct gstruct {
 } gstruct;
 
 typedef struct gstruct_kv {
-    gstruct *key;
-    gstruct *val;
+    gstruct key;
+    gstruct val;
 } gstruct_kv;
 
 gstruct* gstruct_new();
