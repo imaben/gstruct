@@ -202,7 +202,9 @@ static inline void gstruct_buffer_free(gstruct_buffer* buf)
 static inline int gstruct_buffer_write(void* data, const void* buf, size_t len)
 {
     gstruct_buffer* gbuf = (gstruct_buffer*)data;
-
+    if (0 == gbuf->alloc) {
+        gbuf->data = calloc(0, GSTRUCT_BUFFER_INIT_SIZE);
+    }
     if (gbuf->alloc - gbuf->size < len) {
         void* tmp;
         size_t nsize = (gbuf->alloc) ?
