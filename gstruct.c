@@ -107,10 +107,6 @@ int gstruct_add_map(gstruct* gs, size_t n)
 
     gstruct_kv kv;
 
-    for (int i = 1; i < n; i++) {
-        gstruct_buffer_write(gs->buffer, &kv, sizeof(gstruct_kv *));
-    }
-
     for (int i = 0; i < n; i++) {
 	// kv
         gstruct_buffer_write(gs->buffer, &kv, sizeof(gstruct_kv));
@@ -212,22 +208,16 @@ static inline int gstruct_parse(gstruct **gspp, char *buffer, char **offset)
         case GSTRUCT_TYPE_MAP:
             m = &gs->via.map;
             (*gspp)->via.map.size = m->size;
+	    (*gspp)->via.map.ptr = (gstruct_kv *)cursor;
 
-            cursor += sizeof(gstruct_kv *) * ((m->size - 1) * 2);
-	    gstruct_kv *kv_head = (gstruct_kv *)cursor;
-            cursor += sizeof(gstruct_kv) * (m->size * 2);
+            cursor += sizeof(gstruct_kv) * m->size;
             for (i = 0; i < m->size; i++) {
-		(*gspp)->via.map.ptr = kv_head;
-		gstruct *key = &(*gspp)->via.map.ptr->key;
-		gstruct *val = &(*gspp)->via.map.ptr->val;
+		gstruct_kv *kv = (*gspp)->via.map.ptr + i;
+		gstruct *key = &kv->key;
+		gstruct *val = &kv->val;
                 gstruct_parse(&key, cursor, &cursor);
                 gstruct_parse(&val, cursor, &cursor);
-		(*gspp)->via.map.ptr++;
-		kv_head++;
             }
-	    for (i = 0; i < m->size; i++) {
-		(*gspp)->via.map.ptr--;
-	    }
             *offset = cursor;
             return GSTRUCT_SUCCESS;
         case GSTRUCT_TYPE_BIN:
