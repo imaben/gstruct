@@ -42,6 +42,9 @@ typedef int bool;
 #define   GS_BIN_SIZE(g)     g.via.bin.size
 #define   GS_BIN_PTR(g)      g.via.bin.ptr
 
+#define GS_FOREACH(gs, gg) \
+    for (int gs_i = 0; gs_i < GS_ARRSIZE_P(gs) && (gg = &GS_ARRVAL_P(gs, gs_i)); gs_i++)
+
 /**
  * gstruct type
  * @{
@@ -208,7 +211,7 @@ static inline int gstruct_buffer_write(void* data, const void* buf, size_t len)
     if (gbuf->alloc - gbuf->size < len) {
         void* tmp;
         size_t nsize = (gbuf->alloc) ?
-                gbuf->alloc * 2 : GSTRUCT_BUFFER_INIT_SIZE;
+            gbuf->alloc * 2 : GSTRUCT_BUFFER_INIT_SIZE;
 
         while (nsize < gbuf->size + len) {
             size_t tmp_nsize = nsize * 2;

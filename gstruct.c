@@ -108,7 +108,7 @@ int gstruct_add_map(gstruct* gs, size_t n)
     gstruct_kv kv;
 
     for (int i = 0; i < n; i++) {
-	// kv
+        // kv
         gstruct_buffer_write(gs->buffer, &kv, sizeof(gstruct_kv));
     }
 
@@ -190,14 +190,14 @@ static inline int gstruct_parse(gstruct **gspp, char *buffer, char **offset)
             (*gspp)->via.str.ptr = cursor;
             *offset = cursor + gs->via.str.size;
             return GSTRUCT_SUCCESS;
-	case GSTRUCT_TYPE_ARRAY:
-	    a = &gs->via.array;
-	    (*gspp)->via.array.size = a->size;
-	    (*gspp)->via.array.ptr = (gstruct *)cursor;
+        case GSTRUCT_TYPE_ARRAY:
+            a = &gs->via.array;
+            (*gspp)->via.array.size = a->size;
+            (*gspp)->via.array.ptr = (gstruct *)cursor;
 
-	    cursor += sizeof(gstruct) * a->size;
+            cursor += sizeof(gstruct) * a->size;
             for (i = 0; i < a->size; i++) {
-		gstruct *p = (*gspp)->via.array.ptr + i;
+                gstruct *p = (*gspp)->via.array.ptr + i;
                 gstruct_parse(&p, cursor, &cursor);
             }
             *offset = cursor;
@@ -205,20 +205,20 @@ static inline int gstruct_parse(gstruct **gspp, char *buffer, char **offset)
         case GSTRUCT_TYPE_MAP:
             m = &gs->via.map;
             (*gspp)->via.map.size = m->size;
-	    (*gspp)->via.map.ptr = (gstruct_kv *)cursor;
+            (*gspp)->via.map.ptr = (gstruct_kv *)cursor;
 
             cursor += sizeof(gstruct_kv) * m->size;
             for (i = 0; i < m->size; i++) {
-		gstruct_kv *kv = (*gspp)->via.map.ptr + i;
-		gstruct *key = &kv->key;
-		gstruct *val = &kv->val;
+                gstruct_kv *kv = (*gspp)->via.map.ptr + i;
+                gstruct *key = &kv->key;
+                gstruct *val = &kv->val;
                 gstruct_parse(&key, cursor, &cursor);
                 gstruct_parse(&val, cursor, &cursor);
             }
             *offset = cursor;
             return GSTRUCT_SUCCESS;
         case GSTRUCT_TYPE_BIN:
-	    (*gspp)->via.bin.size = gs->via.bin.size;
+            (*gspp)->via.bin.size = gs->via.bin.size;
             (*gspp)->via.bin.ptr = cursor;
             *offset = cursor + gs->via.bin.size;
             return GSTRUCT_SUCCESS;
