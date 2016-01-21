@@ -135,11 +135,8 @@ int gstruct_add_bin(gstruct* gs, size_t l)
 {
     gstruct g;
     g.type = GSTRUCT_TYPE_BIN;
+    g.via.bin.size = l;
     gstruct_buffer_write(gs->buffer, &g, sizeof(gstruct));
-
-    gstruct_bin b;
-    b.size = l;
-    gstruct_buffer_write(gs->buffer, &b, sizeof(gstruct_bin));
 
     return 0;
 }
@@ -221,12 +218,9 @@ static inline int gstruct_parse(gstruct **gspp, char *buffer, char **offset)
             *offset = cursor;
             return GSTRUCT_SUCCESS;
         case GSTRUCT_TYPE_BIN:
-            b = (gstruct_bin *)cursor;
-            (*gspp)->via.bin.size = b->size;
-
-            cursor += sizeof(gstruct_bin);
-            (*gspp)->via.str.ptr = cursor;
-            *offset = cursor + b->size;
+	    (*gspp)->via.bin.size = gs->via.bin.size;
+            (*gspp)->via.bin.ptr = cursor;
+            *offset = cursor + gs->via.bin.size;
             return GSTRUCT_SUCCESS;
         case GSTRUCT_TYPE_EXT:
             // todo
