@@ -43,7 +43,7 @@ typedef int bool;
 #define   GS_BIN_PTR(g)      g.via.bin.ptr
 
 #define GS_FOREACH(gs, gg) \
-    for (int gs_i = 0; gs_i < GS_ARRSIZE_P(gs) && (gg = &GS_ARRVAL_P(gs, gs_i)); gs_i++)
+    for (int gs##gg##_i = 0; gs##gg##_i < GS_ARRSIZE_P(gs) && (gg = &GS_ARRVAL_P(gs, gs##gg##_i)); gs##gg##_i++)
 
 /**
  * gstruct type
