@@ -174,14 +174,11 @@ int gstruct_add_array(gstruct* gs, size_t n);
 
 int gstruct_add_map(gstruct* gs, size_t n);
 
-int gstruct_add_str(gstruct* gs, size_t l);
-int gstruct_add_str_body(gstruct* gs, const void* b, size_t l);
+int gstruct_add_str(gstruct* gs, const void *b, size_t l);
 
-int gstruct_add_bin(gstruct* gs, size_t l);
-int gstruct_add_bin_body(gstruct* gs, const void* b, size_t l);
+int gstruct_add_bin(gstruct* gs, const void *b, size_t l);
 
 int gstruct_add_ext(gstruct* gs, size_t l, int8_t type);
-int gstruct_add_ext_body(gstruct* gs, const void* b, size_t l);
 
 gstruct_apply_return gstruct_apply_data(gstruct *gs);
 /** @} */

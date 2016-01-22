@@ -137,34 +137,25 @@ int gstruct_add_map(gstruct* gs, size_t n)
     return 0;
 }
 
-int gstruct_add_str(gstruct* gs, size_t l)
+int gstruct_add_str(gstruct* gs, const void *b, size_t l)
 {
     gstruct g;
     g.type = GSTRUCT_TYPE_STR;
     g.via.str.size = l;
     gstruct_buffer_write(gs->buffer, &g, sizeof(gstruct));
 
-    return 0;
-}
-
-int gstruct_add_str_body(gstruct* gs, const void* b, size_t l)
-{
     gstruct_buffer_write(gs->buffer, b, l);
+
     return 0;
 }
 
-int gstruct_add_bin(gstruct* gs, size_t l)
+int gstruct_add_bin(gstruct* gs, const void *b, size_t l)
 {
     gstruct g;
     g.type = GSTRUCT_TYPE_BIN;
     g.via.bin.size = l;
     gstruct_buffer_write(gs->buffer, &g, sizeof(gstruct));
 
-    return 0;
-}
-
-int gstruct_add_bin_body(gstruct* gs, const void* b, size_t l)
-{
     gstruct_buffer_write(gs->buffer, b, l);
     return 0;
 }
