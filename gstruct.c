@@ -194,10 +194,8 @@ static inline int gstruct_parse(gstruct **gspp, char *buffer, char **offset)
     (*gspp)->type = gs->type;
     char *cursor = buffer + sizeof(gstruct);
     int i = 0;
-    gstruct_str *s      = NULL;
     gstruct_array *a    = NULL;
     gstruct_map *m      = NULL;
-    gstruct_bin *b      = NULL;
     switch (gs->type) {
         case GSTRUCT_TYPE_NIL:
         case GSTRUCT_TYPE_BOOLEAN:
@@ -250,7 +248,7 @@ static inline int gstruct_parse(gstruct **gspp, char *buffer, char **offset)
         default:
             return GSTRUCT_PARSE_ERROR;
     }
-
+    return GSTRUCT_PARSE_ERROR;
 }
 
 gstruct_apply_return gstruct_apply_data(gstruct *gs)
@@ -259,7 +257,6 @@ gstruct_apply_return gstruct_apply_data(gstruct *gs)
         return GSTRUCT_NOMEM_ERROR;
     }
 
-    gstruct_buffer *buffer = gs->buffer;
     char *offset;
     return gstruct_parse(&gs, gs->buffer->data, &offset);
 }
