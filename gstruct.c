@@ -251,3 +251,22 @@ gstruct_apply_return gstruct_apply_data(gstruct *gs)
     char *offset;
     return gstruct_parse(&gs, gs->buffer->data, &offset);
 }
+
+int gstruct_map_find_str(gstruct *gs, char *find, gstruct **g)
+{
+    if (GS_TYPE_P(gs) != GSTRUCT_TYPE_MAP || !find) {
+        return -1;
+    }
+    for (int i = 0; i < GS_MAPSIZE_P(gs); i++) {
+        gstruct_kv *kv = &GS_MAPVAL_P(gs, i);
+        gstruct *key = &kv->key;
+        if (key->type != GSTRUCT_TYPE_STR) {
+            continue;
+        }
+        if (strncmp(find, GS_STR_PTR_P(key), strlen(find)) == 0) {
+            *g = &kv->val;
+            return i;
+        }
+    }
+    return -1;
+}

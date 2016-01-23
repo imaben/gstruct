@@ -183,7 +183,7 @@ int gstruct_add_ext(gstruct* gs, size_t l, int8_t type);
 gstruct_apply_return gstruct_apply_data(gstruct *gs);
 /** @} */
 
-
+int gstruct_map_find_str(gstruct *gs, char *find, gstruct **g);
 
 /**
  * Buffer struct
